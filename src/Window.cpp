@@ -12,7 +12,7 @@ Window::Window(const std::string& name, sf::Vector2u size)
 
 Window::~Window()
 {
-	m_eventManager.removeCallback("WindowClose");
+	m_eventManager.removeCallback(static_cast<StateName>(0), "WindowClose");
 }
 
 /*******************
@@ -63,6 +63,11 @@ sf::Vector2u Window::getSize() const
 	return m_window.getSize();
 }
 
+sf::RenderWindow* Window::getRenderWindow()
+{
+	return &m_window;
+}
+
 EventManager* Window::getEventManager()
 {
 	return &m_eventManager;
@@ -77,7 +82,7 @@ void Window::setup(const std::string& name, sf::Vector2u size)
 	m_window.create(sf::VideoMode (size.x, size.y), name, sf::Style::Close);
 	
 	m_eventManager.loadFromFile("Assets/keys.cfg");
-	m_eventManager.addCallback("WindowClose", &Window::close, this);
+	m_eventManager.addCallback(static_cast<StateName>(0), "WindowClose", &Window::close, this);
 }
 
 void Window::close(EventDetails*)

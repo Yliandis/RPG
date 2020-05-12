@@ -1,8 +1,9 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include <SFML/Graphics.hpp>
 #include <string>
+
+#include <SFML/Graphics.hpp>
 
 #include "EventManager.h"
 
@@ -24,6 +25,7 @@ class Window : sf::NonCopyable
 		bool isOpen() const;
 		sf::Vector2u getSize() const;
 		
+		sf::RenderWindow* getRenderWindow();
 		EventManager* getEventManager();
 		
 	private:

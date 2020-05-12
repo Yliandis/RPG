@@ -49,15 +49,9 @@ void EventManager::loadFromFile(const std::string& filename)
 	file.close();
 }
 
-void EventManager::removeCallback(const std::string& bindName)
+void EventManager::switchTo(StateName state)
 {
-	auto found = m_callbacks.find(bindName);
-	if (found == m_callbacks.end())
-	{
-		throw std::invalid_argument ("Unable to find callback name : " + bindName);
-	}
-	
-	m_callbacks.erase(found);
+	m_currentState = state;
 }
 
 void EventManager::handleEvent(sf::Event sfmlEvent)
@@ -126,16 +120,47 @@ void EventManager::update()
 		
 		if (count == events.size())
 		{
-			auto found = m_callbacks.find(binding.first);
-			if (found == m_callbacks.end())
+			auto foundState = m_callbacks.find(m_currentState);
+			auto permanentState = m_callbacks.find(static_cast<StateName>(0));
+			
+			if (foundState != m_callbacks.end())
 			{
-				throw std::invalid_argument ("Unable to find callback name : " + binding.first);
+				auto found = foundState->second.find(binding.first);
+				if (found != foundState->second.end())
+				{
+					found->second(&details);
+					binding.second->reset();
+				}
 			}
 			
-			found->second(&details);
-			binding.second->reset();
+			if (permanentState != m_callbacks.end())
+			{
+				auto found = permanentState->second.find(binding.first);
+				if (found != permanentState->second.end())
+				{
+					found->second(&details);
+					binding.second->reset();
+				}
+			}
 		}
 	}
+}
+
+void EventManager::removeCallback(StateName state, const std::string& bindName)
+{
+	auto foundState = m_callbacks.find(state);
+	if (foundState == m_callbacks.end())
+	{
+		throw std::invalid_argument ("Unable to find state name : " + std::to_string(static_cast<int>(state)));
+	}
+	
+	auto found = foundState->second.find(bindName);
+	if (found == foundState->second.end())
+	{
+		throw std::invalid_argument ("Unable to find callback name : " + bindName);
+	}
+	
+	foundState->second.erase(found);
 }
 
 sf::Vector2i EventManager::getMousePos(sf::Window* window)

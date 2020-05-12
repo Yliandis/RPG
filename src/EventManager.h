@@ -79,7 +79,9 @@ struct Binding
 };
 
 using Bindings = std::unordered_map<std::string, std::unique_ptr<Binding>>;
-using Callbacks = std::unordered_map<std::string, std::function<void(EventDetails*)>>;
+using CallbackContainer = std::unordered_map<std::string, std::function<void(EventDetails*)>>;
+enum class StateName;
+using Callbacks = std::unordered_map<StateName, CallbackContainer>;
 
 class EventManager
 {
@@ -87,12 +89,14 @@ class EventManager
 		
 		void loadFromFile(const std::string&);
 		
-		template <typename T>
-		void addCallback(const std::string&, void(T::*)(EventDetails*), T*);
-		void removeCallback(const std::string&);
+		void switchTo(StateName);
 		
 		void handleEvent(sf::Event);
 		void update();
+		
+		template <typename T>
+		void addCallback(StateName, const std::string&, void(T::*)(EventDetails*), T*);
+		void removeCallback(StateName, const std::string&);
 		
 		static sf::Vector2i getMousePos(sf::Window* = nullptr);
 		
@@ -100,13 +104,17 @@ class EventManager
 		
 		Bindings m_bindings;
 		Callbacks m_callbacks;
+		
+		StateName m_currentState;
 };
 
 template <typename T>
-void EventManager::addCallback(const std::string& bindName, void(T::*function)(EventDetails*), T* instance)
+void EventManager::addCallback(StateName state, const std::string& bindName, void(T::*function)(EventDetails*), T* instance)
 {
+	auto it = m_callbacks.emplace(state, CallbackContainer ()).first;
+	
 	auto callback = std::bind(function, instance, std::placeholders::_1);
-	if (!m_callbacks.emplace(bindName, callback).second)
+	if (!it->second.emplace(bindName, callback).second)
 	{
 		throw std::logic_error ("Callback already added : " + bindName);
 	}
