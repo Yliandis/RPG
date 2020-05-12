@@ -3,7 +3,7 @@
 const sf::Time Game::updateTime = sf::seconds(1.f / 60.f);
 
 Game::Game()
-: m_window ("RPG", {640u, 480u})
+: m_window ("RPG", {860u, 640u})
 , m_stateManager(&m_sharedContext)
 {
 	m_sharedContext.m_window = &m_window;

@@ -41,11 +41,11 @@ void StateWorld::update(sf::Time dt)
 {
 	sf::FloatRect rect = m_test.getGlobalBounds();
 	
-	if (rect.top < 0.f || rect.top + rect.height > 480.f)
+	if (rect.top < 0.f || rect.top + rect.height > 640.f)
 	{
 		m_velocity.y = -m_velocity.y;
 	}
-	if (rect.left < 0.f || rect.left + rect.width > 640.f)
+	if (rect.left < 0.f || rect.left + rect.width > 860.f)
 	{
 		m_velocity.x = -m_velocity.x;
 	}
@@ -63,29 +63,31 @@ void StateWorld::draw()
 void StateWorld::moveTest(EventDetails* details)
 {
 	sf::Vector2i pos = EventManager::getMousePos(m_stateManager->getContext()->m_window->getRenderWindow());
+	m_lastPos = m_pos;
+	m_pos = pos;
 	
 	if (m_holding)
 	{
 		m_test.setPosition(pos.x, pos.y);
-	}
-	
-	sf::FloatRect rect = m_test.getGlobalBounds();
-	
-	if (rect.top <= 0.f)
-	{
-		m_test.move(0.f, -rect.top);
-	}
-	if (rect.top + rect.height >= 480.f)
-	{
-		m_test.move(0.f, 480.f - rect.top - rect.height);
-	}
-	if (rect.left <= 0.f)
-	{
-		m_test.move(-rect.left, 0.f);
-	}
-	if (rect.left + rect.width >= 640.f)
-	{
-		m_test.move(640.f - rect.left - rect.width, 0.f);
+		
+		sf::FloatRect rect = m_test.getGlobalBounds();
+		
+		if (rect.top <= 0.f)
+		{
+			m_test.move(0.f, -rect.top);
+		}
+		if (rect.top + rect.height >= 640.f)
+		{
+			m_test.move(0.f, 640.f - rect.top - rect.height);
+		}
+		if (rect.left <= 0.f)
+		{
+			m_test.move(-rect.left, 0.f);
+		}
+		if (rect.left + rect.width >= 860.f)
+		{
+			m_test.move(860.f - rect.left - rect.width, 0.f);
+		}
 	}
 }
 
@@ -103,5 +105,13 @@ void StateWorld::capture(EventDetails* details)
 
 void StateWorld::release(EventDetails* details)
 {
-	m_holding = false;
+	if (m_holding)
+	{
+		m_velocity.x = m_pos.x - m_lastPos.x;
+		m_velocity.y = m_pos.y - m_lastPos.y;
+		
+		m_velocity *= 10.f;
+		
+		m_holding = false;
+	}
 }

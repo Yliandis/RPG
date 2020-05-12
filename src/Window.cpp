@@ -80,6 +80,7 @@ EventManager* Window::getEventManager()
 void Window::setup(const std::string& name, sf::Vector2u size)
 {
 	m_window.create(sf::VideoMode (size.x, size.y), name, sf::Style::Close);
+	m_window.setKeyRepeatEnabled(false);
 	
 	m_eventManager.loadFromFile("Assets/keys.cfg");
 	m_eventManager.addCallback(static_cast<StateName>(0), "WindowClose", &Window::close, this);

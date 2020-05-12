@@ -34,6 +34,8 @@ class StateWorld : public StateBase
 		
 		sf::RectangleShape m_test;
 		sf::Vector2f m_velocity;
+		sf::Vector2i m_lastPos;
+		sf::Vector2i m_pos;
 		bool m_holding;
 };
 
