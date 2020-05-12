@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Color.hpp>
+#include <SFML/System/Vector2.hpp>
 
 class StateWorld : public StateBase
 {
@@ -26,10 +27,14 @@ class StateWorld : public StateBase
 	private:
 		
 		void moveTest(EventDetails*);
+		void capture(EventDetails*);
+		void release(EventDetails*);
 		
 	private:
 		
 		sf::RectangleShape m_test;
+		sf::Vector2f m_velocity;
+		bool m_holding;
 };
 
 #endif // STATEWORLD_H
